@@ -95,23 +95,33 @@ function doPost(e) {
       // 移出當天的紀錄訊息，因為還沒結算
       messages.pop();
     }
-
-    reply();
   } else if (userText) {
-    appendTextToMessages(`${userText}`);
-    const [date, count] = userText.split(' ');
-    appendTextToMessages(`userText ${currentRow} ${date} ${count}`);
+    if (/[0-9]\/[0-9]\/[0-9]/.test(userText)) {
+      // 跟日期有關
+      const [date, count] = userText.split(' ');
 
-    if (count === undefined) {
-      // get count
-      appendTextToMessages(`nonono`);
-      const recordRow = record.getRange(1, 1, currentRow, 1).getValues().indexOf(date) + 1;
-      appendTextToMessages(`recordRow ${recordRow}`);
-      const recordCount = record.getRange(recordRow, 1).getValue();
-      appendTextToMessages(`recordRow ${recordCount}`);
-      appendTextToMessages(`${date} ${recordCount}`);
+      if (count === undefined) {
+        // get count
+        const recordRow =
+          record
+            .getRange(1, 1, currentRow, 1)
+            .getValues()
+            .flat()
+            .map((d) => getDateText(new Date(d)))
+            .indexOf(date) + 1;
+        if (recordRow > 0) {
+          const recordCount = record.getRange(recordRow, 2).getValue();
+          appendTextToMessages(`${date} ${recordCount}`);
+        } else {
+          appendTextToMessages('No record');
+        }
+      } else {
+        // set count
+      }
     } else {
-      // set count
+      // 純文字
     }
   }
+
+  reply();
 }
