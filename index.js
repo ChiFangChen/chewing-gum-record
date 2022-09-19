@@ -70,7 +70,7 @@ function doPost(e) {
       let lastRecordDate = new Date(record.getRange(currentRow, 1).getValue());
       // print the data of the last day
       appendTextToMessages(
-        `${getDateText(lastRecordDate)} ${record.getRange(currentRow, 2).getValue()}`
+        `* ${getDateText(lastRecordDate)} *  ${record.getRange(currentRow, 2).getValue()}`
       );
 
       record.getRange(1, 3).setValue(userSticker);
@@ -85,7 +85,9 @@ function doPost(e) {
           // 最後一天到今天之內的日期要補 0
           sheet.appendRow([getDateText(lastRecordDate), 0]);
           appendTextToMessages(
-            `${getDateText(lastRecordDate)} ${record.getRange(record.getLastRow(), 2).getValue()}`
+            `* ${getDateText(lastRecordDate)} *  ${record
+              .getRange(record.getLastRow(), 2)
+              .getValue()}`
           );
         }
 
@@ -112,11 +114,11 @@ function doPost(e) {
         if (count === undefined) {
           // get count
           const recordCount = record.getRange(recordRow, 2).getValue();
-          appendTextToMessages(`${date} ${recordCount}`);
+          appendTextToMessages(`* ${date} *  ${recordCount}`);
         } else {
           // set count
           const recordCount = record.getRange(recordRow, 2).setValue(count);
-          appendTextToMessages(`${date} ${count}`);
+          appendTextToMessages(`* ${date} *  ${count}`);
         }
       } else {
         appendTextToMessages('No record');
@@ -132,7 +134,7 @@ function doPost(e) {
         .flat()
         .map(
           (d, i) =>
-            `${getDateText(new Date(d))} ${record
+            `* ${getDateText(new Date(d))} *  ${record
               .getRange(currentRow - (count - 1) + i, 2)
               .getValue()}`
         )
