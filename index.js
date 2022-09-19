@@ -125,6 +125,13 @@ function doPost(e) {
       }
     } else if (userText === 'help') {
       // 純文字
+      appendTextToMessages(
+        '💖 commands: \n' +
+          "1. sticker - use the same sticker to record the counts(can't use the same one to record the data of the relative dates)\n" +
+          '2. {{year}}/{{month}}/{{date}} - to get the data of specific date\n' +
+          '3. {{year}}/{{month}}/{{date}} {{count}} - to set the data of specific date with {{count}}\n' +
+          '4. list {{count}} - to see the data of previous {{count}} record. the default count is 7.'
+      );
     } else if (userText.startsWith('list')) {
       // 看列表
       const [_, count = 7] = userText.split(' ');
