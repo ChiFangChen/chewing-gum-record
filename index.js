@@ -53,6 +53,11 @@ function doPost(e) {
 
   const getDateText = (date) => `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`;
 
+  const addCurrentCount = () => {
+    const currentCount = record.getRange(currentRow, 2);
+    currentCount.setValue(currentCount.getValue() + 1);
+  };
+
   const currentRow = record.getLastRow();
 
   // 進入正題
@@ -60,8 +65,7 @@ function doPost(e) {
     const prevSticker = record.getRange(1, 3).getValue();
 
     if (prevSticker === userSticker) {
-      const currentCount = record.getRange(currentRow, 2);
-      currentCount.setValue(currentCount.getValue() + 1);
+      addCurrentCount();
     } else {
       let lastRecordDate = new Date(record.getRange(currentRow, 1).getValue());
       // print the data of the last day
@@ -73,18 +77,23 @@ function doPost(e) {
       const now = new Date();
       const today = getDateText(now);
 
-      while (lastRecordDate.valueOf() !== new Date(today).valueOf()) {
-        lastRecordDate = new Date(lastRecordDate.valueOf() + 24 * 60 * 60 * 1000);
-        // 最後一天到今天之內的日期要補 0
-        sheet.appendRow([getDateText(lastRecordDate), 0]);
-        appendTextToMessages(
-          `${getDateText(lastRecordDate)} ${record.getRange(record.getLastRow(), 2).getValue()}`
-        );
+      if (lastRecordDate.valueOf() === new Date(today).valueOf()) {
+        addCurrentCount();
+      } else {
+        while (lastRecordDate.valueOf() !== new Date(today).valueOf()) {
+          lastRecordDate = new Date(lastRecordDate.valueOf() + 24 * 60 * 60 * 1000);
+          // 最後一天到今天之內的日期要補 0
+          sheet.appendRow([getDateText(lastRecordDate), 0]);
+          appendTextToMessages(
+            `${getDateText(lastRecordDate)} ${record.getRange(record.getLastRow(), 2).getValue()}`
+          );
+        }
+
+        record.getRange(record.getLastRow(), 2).setValue(1);
       }
 
+      // 移出當天的紀錄訊息，因為還沒結算
       messages.pop();
-
-      record.getRange(record.getLastRow(), 2).setValue(1);
     }
 
     reply();
