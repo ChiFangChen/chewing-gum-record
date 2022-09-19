@@ -100,26 +100,48 @@ function doPost(e) {
       // 跟日期有關
       const [date, count] = userText.split(' ');
 
-      if (count === undefined) {
-        // get count
-        const recordRow =
-          record
-            .getRange(1, 1, currentRow, 1)
-            .getValues()
-            .flat()
-            .map((d) => getDateText(new Date(d)))
-            .indexOf(date) + 1;
-        if (recordRow > 0) {
+      const recordRow =
+        record
+          .getRange(1, 1, currentRow, 1)
+          .getValues()
+          .flat()
+          .map((d) => getDateText(new Date(d)))
+          .indexOf(date) + 1;
+
+      if (recordRow > 0) {
+        if (count === undefined) {
+          // get count
           const recordCount = record.getRange(recordRow, 2).getValue();
           appendTextToMessages(`${date} ${recordCount}`);
         } else {
-          appendTextToMessages('No record');
+          // set count
+          const recordCount = record.getRange(recordRow, 2).setValue(count);
+          appendTextToMessages(`${date} ${count}`);
         }
       } else {
-        // set count
+        appendTextToMessages('No record');
       }
+    } else if (userText === 'help') {
+      // 純文字
+    } else if (userText.startsWith('list')) {
+      // 看列表
+      const [_, count = 7] = userText.split(' ');
+      const list = record
+        .getRange(currentRow - (count - 1), 1, count, 1)
+        .getValues()
+        .flat()
+        .map(
+          (d, i) =>
+            `${getDateText(new Date(d))} ${record
+              .getRange(currentRow - (count - 1) + i, 2)
+              .getValue()}`
+        )
+        .join('\n');
+
+      appendTextToMessages(list);
     } else {
       // 純文字
+      appendTextToMessages('Type *help* to see the commands');
     }
   }
 
