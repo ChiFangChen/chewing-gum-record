@@ -9,7 +9,8 @@ function doPost(e) {
   const userMessage = msg.events[0];
   const replyToken = userMessage.replyToken; // 回覆的 token
   // 抓取使用者傳的訊息內容
-  const userText = userMessage.message.type === 'text' ? userMessage.message.text : undefined;
+  const userText =
+    userMessage.message.type === 'text' ? userMessage.message.text.toLowerCase() : undefined;
   // 抓取使用者傳的貼圖內容
   const userSticker =
     userMessage.message.type === 'sticker'
