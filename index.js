@@ -51,29 +51,45 @@ function doPost(e) {
     });
   }
 
-  appendTextToMessages(`${userSticker} ${userText}`);
+  const getDateText = (date) => `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`;
+
+  const currentRow = record.getLastRow();
 
   // 進入正題
   if (userSticker) {
-    appendTextToMessages(`${userSticker}`);
     const prevSticker = record.getRange(1, 3).getValue();
-    appendTextToMessages(`prev sticker: ${prevSticker}`);
 
     if (prevSticker === userSticker) {
-      const currentRow = record.getLastRow();
       const currentCount = record.getRange(currentRow, 2);
       currentCount.setValue(currentCount.getValue() + 1);
-      appendTextToMessages(`the same`);
     } else {
-      appendTextToMessages(`new one!`);
+      let lastRecordDate = new Date(record.getRange(currentRow, 1).getValue());
+      // print the data of the last day
+      appendTextToMessages(
+        `${getDateText(lastRecordDate)} ${record.getRange(currentRow, 2).getValue()}`
+      );
+
       record.getRange(1, 3).setValue(userSticker);
-      appendTextToMessages(`set new sticker: ${userSticker}`);
+      const now = new Date();
+      const today = getDateText(now);
+
+      while (lastRecordDate.valueOf() !== new Date(today).valueOf()) {
+        lastRecordDate = new Date(lastRecordDate.valueOf() + 24 * 60 * 60 * 1000);
+        // 最後一天到今天之內的日期要補 0
+        sheet.appendRow([getDateText(lastRecordDate), 0]);
+        appendTextToMessages(
+          `${getDateText(lastRecordDate)} ${record.getRange(record.getLastRow(), 2).getValue()}`
+        );
+      }
+
+      messages.pop();
+
+      record.getRange(record.getLastRow(), 2).setValue(1);
     }
 
     reply();
   } else if (userText) {
     appendTextToMessages(`${userText}`);
-    const currentRow = record.getLastRow();
     const [date, count] = userText.split(' ');
     appendTextToMessages(`userText ${currentRow} ${date} ${count}`);
 
